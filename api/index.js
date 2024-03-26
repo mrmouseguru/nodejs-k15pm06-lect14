@@ -72,29 +72,36 @@ myApi.get("/students/:id", (req, res) => {
   res.json(student);
 });
 
-myApi.patch("/students/:id", (req, res) => {
+myApi.patch("/students/:id", async (req, res) => {
   let student = res.locals.student;
   student.dept = req.body.dept;
   //mongo
-  Students.replaceOne({id: student.id}, student);
+  await Students.replaceOne({id: student.id}, student);
   res.json(student);
 });
 
 /*** This part was added after lecture ***/
 
-myApi.get("/students/:id/courses", (req, res) => {
+myApi.get("/students/:id/courses", async (req, res) => {
   let student = res.locals.student;
-  let courses = COURSES[student.id];
+  //let courses = COURSES[student.id];
+  let data = await Enrollments.find({studentId : student.id}).toArray();
+  let courses = [];
+  for(let doc of data){
+    courses.push({code : doc.code, units : doc.units});
+  }
   res.json({ courses: courses });
 });
 
-myApi.post("/students/:id/courses", (req, res) => {
+myApi.post("/students/:id/courses", async (req, res) => {
   let student = res.locals.student;
-  let courses = COURSES[student.id];
+  //let courses = COURSES[student.id];
   let code = req.body.code;
   let units = req.body.units;
-  courses.push({ code, units });
+  //courses.push({ code, units });
+  await Enrollments.insertOne({studentId : student.id, code, units});
   student.units += units;
+  await Students.replaceOne({id: student.id}, student);
   res.json({ success: true });
 });
 
