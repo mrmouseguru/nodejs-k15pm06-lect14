@@ -75,6 +75,8 @@ myApi.get("/students/:id", (req, res) => {
 myApi.patch("/students/:id", (req, res) => {
   let student = res.locals.student;
   student.dept = req.body.dept;
+  //mongo
+  Students.replaceOne({id: student.id}, student);
   res.json(student);
 });
 
