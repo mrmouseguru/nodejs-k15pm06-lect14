@@ -10,6 +10,10 @@ const main = async () =>{
 
    await myColl.insertOne({binky : "winky", num: 2024});
 
+   let docs = await myColl.find({num : 193}).toArray();
+
+   console.log(docs);
+
 
 
 };
